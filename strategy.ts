@@ -17,6 +17,13 @@
 // T3 EV rationale: at a ~15% win rate, TP +25% / SL -15% is -9% EV per trade
 // before fees (0.15*25 - 0.85*15), so T4 tightens entry selectivity and
 // stretches the payoff (TP +60%, SL -12%) so winners pay for many more losers.
+//
+// T6 revise2: the dev window shows almost every new coin's opening tape looks
+// buy-dominated, so the T4 filters barely cut entries; v2 graded -0.4246 SOL
+// (12% win, 651 coins). This variant is one stricter, bigger-payoff step:
+// entries need a 0.50 SOL net flow, 6 distinct buyers, +15% runup and a coin
+// that survived its first minute (minAge 60 slots, real SOL >= 2.0), and
+// winners run to +100% TP with a 30%/20% trail and a 900-slot max hold.
 
 import {
   LAMPORTS_PER_SOL,
@@ -67,27 +74,27 @@ export interface StrategyParams {
 }
 
 export const DEFAULT_PARAMS: StrategyParams = {
-  minAge: 0,
+  minAge: 60,
   maxAge: 120,
   minTrades: 5,
   minBuyShareBps: 8000,
-  minBuyers: 4,
+  minBuyers: 6,
   maxBuyerShareBps: 5000,
-  minNetFlowLamports: 200_000_000n, // 0.20 SOL
-  minRunupBps: 800, // +8%
-  maxRunupBps: 6000, // +60%
-  minRealSolLamports: 1_000_000_000n, // 1.0 SOL
+  minNetFlowLamports: 500_000_000n, // 0.50 SOL
+  minRunupBps: 1500, // +15%
+  maxRunupBps: 5000, // +50%
+  minRealSolLamports: 2_000_000_000n, // 2.0 SOL
   maxRealSolLamports: 30_000_000_000n, // 30 SOL
   maxBigSellLamports: 500_000_000n, // 0.5 SOL
   skipCreatorSold: true,
   stakeLamports: 80_000_000n, // 0.08 SOL
   buySlippageBps: 2000,
   sellSlippageBps: 10000,
-  takeProfitBps: 6000, // +60%
+  takeProfitBps: 10000, // +100%
   stopLossBps: 1200, // -12%
-  trailArmBps: 2500, // +25%
-  trailBps: 1500, // 15% giveback from peak
-  maxHoldSlots: 600,
+  trailArmBps: 3000, // +30%
+  trailBps: 2000, // 20% giveback from peak
+  maxHoldSlots: 900,
   fadeNetSolLamports: 200_000_000n, // 0.20 SOL
   exitOnCreatorSell: true,
   bigSellExitSolLamports: 500_000_000n, // 0.5 SOL
